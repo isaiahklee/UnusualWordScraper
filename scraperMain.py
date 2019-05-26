@@ -10,8 +10,16 @@
 
 
 
+#function to parse that the given input is a real website name/has at least 1 real website.
+#throw errors for improperly formated websites
+#inputParam/s: the list main is given, but puts it into a nice array
+#output/s: return array of good websites (only contains one thing if only one website given to it)
+
+
+
 #function to deal with robots.txt
-#output/s: error if we shouldn't access the file, 0 if we can, or a number greater than 0 which we should 
+#inputParam/s: the website to check the robot.txt of.
+#output/s: error if we shouldn't access the site w/ scraper || 0 if we can || or a number greater than 0 which we should 
 #       interpret is milleseconds we need to wait between consecutive accesses of subpages of the website. 
 
 
