@@ -4,6 +4,7 @@
 #imports
 
 
+
 #main function
 #inputParam/s: website to scrape, or list of websites to scrape in .txt file delineated by newlines (maybe also add json support)
 #output/s: return final unusual word list as json to be used and displayed in html page.
@@ -31,3 +32,5 @@
 
 #function to search webdata for unusual words. 
 #inputParam/s: json webdata file
+
+
