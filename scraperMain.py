@@ -2,13 +2,30 @@
 #written by Isaiah K. Lee
 
 #imports
+from bs4 import BeautifulSoup
 
+import requests
 
 
 #main function
 #inputParam/s: website to scrape, or list of websites to scrape in .txt file delineated by newlines (maybe also add json support)
 #output/s: return final unusual word list as json to be used and displayed in html page.
 
+url = 'https://en.wikipedia.org/wiki/Extremely_low_frequency'
+response = requests.get(url)
+soup = BeautifulSoup(response.content)
+#remove script and style elements
+for script in soup(["script", "style"]):
+    script.extract()    # rip it out
+#get text
+text = soup.get_text()
+#break into lines and remove leading and trailing space on each
+lines = (line.strip() for line in text.splitlines())
+#break multi-headlines into a line each
+chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+#remove blank lines
+text = '\n'.join(chunk for chunk in chunks if chunk)
+print(text)
 
 
 #function to parse that the given input is a real website name/has at least 1 real website.
@@ -30,7 +47,7 @@
 
 
 
-#function to search webdata for unusual words. 
+#function to search webdata for unusual words. Use "Rainbow Table" hashes to make search time constant for each word.
 #inputParam/s: json webdata file
 
 
