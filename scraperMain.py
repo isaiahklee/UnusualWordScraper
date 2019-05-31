@@ -17,30 +17,18 @@ def main():
     url = sys.argv[1]
     hashFile = sys.argv[2]
 
-    #internet stuff
-    response = requests.get(url)
-    if response.status_code != 200:
-        print("there's been an error in fetching the website")
-        exit()
+    #if we're given a url, just parse it normally. 
+    if url.find("http://") == 0 or url.find("https://") == 0:
+        #internet stuff
+        response = requests.get(url)
+        if response.status_code != 200:
+            print("there's been an error in fetching the website")
+            exit()
+    else:
+        response = checkInput(url)
     #soupify
     soup = BeautifulSoup(response.content, 'html.parser')
-    #remove script and style elements
-    for script in soup(["script", "style"]):
-        script.extract()    # rip it out
-    #get text
-    text = soup.get_text()
-    #break into lines and remove leading and trailing space on each
-    lines = (line.strip() for line in text.splitlines())
-    #break multi-headlines into a line each
-    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    #remove blank lines
-    text = '\n'.join(chunk for chunk in chunks if chunk)
-    text = text.lower()
-    #remove special characters and store text in array
-    wordList = re.findall(r'[A-Za-z]*[A-Za-z]', text)
-    '''#if find ' remove it and following characters 
-    for word in wordList:
-        print(word.lower())'''
+    wordList = parseText(soup)
     unusualList = makeUnusualList(wordList, hashFile)
 
     unusualf = open("unusualwordlist.txt", "w") #file to output to
@@ -63,9 +51,27 @@ def checkInput(inarray):
 
 
 
-#function to parse webdata into json?
+#function to parse webdata into word array?
 #output/s: return json words list with html tags and other useless/code stuff stripped
-
+def parseText(soup):
+    #remove script and style elements
+    for script in soup(["script", "style"]):
+        script.extract()    # rip it out
+    #get text
+    text = soup.get_text()
+    #break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in text.splitlines())
+    #break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    #remove blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+    text = text.lower()
+    #remove special characters and store text in array
+    wordList = re.findall(r'[A-Za-z]*[A-Za-z]', text)
+    '''#if find ' remove it and following characters 
+    for word in wordList:
+        print(word.lower())'''
+    return wordList
 
 
 #function to search webdata for unusual words. Use hashtable to make search time constant for each word.
