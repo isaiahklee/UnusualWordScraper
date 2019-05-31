@@ -5,6 +5,8 @@
 
 #imports
 import sys
+from hashlib import sha256
+import listnode as ls
 
 #preprocessing
 def file_len(fname):
@@ -16,22 +18,17 @@ def file_len(fname):
 
 #global vars
 inputFileName = sys.argv[1] #name of input file in directory
-inputsize = file_len(inputFileName); #how many newlines are in the input file basically.
+inputsize = file_len(inputFileName)*2; #how many newlines are in the input file basically, mult by 2 to minimize collisions.
 hashList = []   #array of linked lists. 
 
-#linked list node for hashes (linked list so can handle collisions)
-class listNode:
-    def __init__(self, data, nextItem):
-        self.data = data
-        self.next = nextItem
-    def addNext(nextItem):
-        self.next = nextItem
 
-#create list of empty linked lists. 
+
+
+#create array of empty linked lists. 
 i = 0
 while i < inputsize:
-    #create listNode elem to add to list
-    head = listNode("test", None)
+    #create ls.listnode elem to add to list
+    head = ls.listnode(None)
     hashList.append(head)
     i = i + 1
 '''testing
@@ -40,9 +37,43 @@ while i < len(hashList):
     print(hashList[i].data)
     i += 1
 '''
-#
-print(inputsize)
+#open file, hash each line, add hash to another file
+hashf = open("hashtable.txt", "w") #file to output to
+with open(inputFileName, "rb") as wordf: #file to get input from
+    for i, l in enumerate(wordf):
+        tempWord = l 
+        # we have a word, we need to hash it and insert it into our array
+        tempHash = int(sha256(tempWord).hexdigest(), 16)
+        #print("id: " + str(i) + " hash: " + str(tempHash))
+        arrPos = tempHash % len(hashList) #position to insert hash into array
+        arrData = hashList[arrPos] # the node at that position
+        if arrData.data == None: #if the given hash position is empty
+            arrData.addData(tempHash)
+        else: #it already has data
+            #print("collision")
+            #traverse to end of linked list and add
+            tempNode = arrData
+            while tempNode.hasNext():
+                print("double collision")
+                tempNode = tempNode.next
+            newNode = ls.listnode(tempHash)
+            tempNode.addNext(newNode)
+        #test
+        #print("index:" + str(i) + " wrd:" + str(tempWord).rstrip() + " hsh:" + str(tempHash))
+        
+        #insert data into outputFile
+        #hashf.write(tempWord.decode().rstrip() + " ," + str(tempHash) + "\n")
+        hashf.write(str(tempHash) + "\n")
+
 '''
-#open file to write to (will be a list of hashes)
-f = open("hashtable.txt", "w")
+#print test
+for node in hashList:
+    if node.hasData:
+        print(str(node.data))
+        if node.hasNext():
+            tempNode = node.next
+            print("---" + str(tempNode.data))
+            while tempNode.hasNext():
+                tempNode = tempNode.next
+                print("---" + str(tempNode.data))
 '''
