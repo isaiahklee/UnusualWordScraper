@@ -35,6 +35,7 @@ def main():
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     #remove blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
+    text = text.lower()
     #remove special characters and store text in array
     wordList = re.findall(r'[A-Za-z]*[A-Za-z]', text)
     '''#if find ' remove it and following characters 
@@ -70,7 +71,7 @@ def checkInput(inarray):
 def makeUnusualList(webdata, hashFile):
     unusualList = []
     #inputsize = file_len(inputFileName)*2; #how many newlines are in the input file basically, mult by 2 to minimize collisions.
-    inputsize = 100
+    inputsize = 20000
     hashList = []   #array of linked lists. 
 
     #create array of empty linked lists. 
@@ -85,7 +86,7 @@ def makeUnusualList(webdata, hashFile):
     with open(hashFile, "r") as wordf: #file to get input from
         i = 0
         for i, ahash in enumerate(wordf):
-             
+            
             arrPos = int(ahash) % len(hashList) #position to insert hash into array
             arrData = hashList[arrPos] # the node at that position
             if arrData.data == None: #if the given hash position is empty
@@ -95,13 +96,13 @@ def makeUnusualList(webdata, hashFile):
                 #traverse to end of linked list and add
                 tempNode = arrData
                 while tempNode.hasNext():
-                    print("double collision")
+                    #print("double collision")
                     tempNode = tempNode.next
                 newNode = ls.listnode(int(ahash))
                 tempNode.addNext(newNode)
             #test
             #print("index:" + str(i) + " hsh:" + ahash)
-'''
+    '''
     for node in hashList:
         if node.hasData:
             print(str(node.data))
@@ -111,10 +112,17 @@ def makeUnusualList(webdata, hashFile):
                 while tempNode.hasNext():
                     tempNode = tempNode.next
                     print("---" + str(tempNode.data))
-'''
+    '''
 
     #for every word, check it against hash table
     #for word in webdata:
+    #TODO dont print duplicates. do this by creating a second hash table while reading through this one. 
+    for word in webdata:
+        compInt = int(sha256(word.encode()).hexdigest(), 16)
+        arrPos = compInt % len(hashList) #position to insert hash into array
+        arrData = hashList[arrPos] # the node at that position
+        if arrData.data == None: #if the given hash position is empty
+            unusualList.append(word)
 
 
 

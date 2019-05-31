@@ -39,12 +39,14 @@ while i < len(hashList):
 '''
 #open file, hash each line, add hash to another file
 hashf = open("hashtable.txt", "w") #file to output to
-with open(inputFileName, "rb") as wordf: #file to get input from
+with open(inputFileName, "r") as wordf: #file to get input from
     for i, l in enumerate(wordf):
-        tempWord = l 
+        tempWord = l.rstrip()
+        print(tempWord)
         # we have a word, we need to hash it and insert it into our array
-        tempHash = int(sha256(tempWord).hexdigest(), 16)
+        tempHash = int(sha256(tempWord.encode()).hexdigest(), 16)
         #print("id: " + str(i) + " hash: " + str(tempHash))
+        '''
         arrPos = tempHash % len(hashList) #position to insert hash into array
         arrData = hashList[arrPos] # the node at that position
         if arrData.data == None: #if the given hash position is empty
@@ -60,7 +62,7 @@ with open(inputFileName, "rb") as wordf: #file to get input from
             tempNode.addNext(newNode)
         #test
         #print("index:" + str(i) + " wrd:" + str(tempWord).rstrip() + " hsh:" + str(tempHash))
-        
+        '''
         #insert data into outputFile
         #hashf.write(tempWord.decode().rstrip() + " ," + str(tempHash) + "\n")
         hashf.write(str(tempHash) + "\n")
