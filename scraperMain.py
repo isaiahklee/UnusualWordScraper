@@ -42,8 +42,11 @@ def main():
     for word in wordList:
         print(word.lower())'''
     unusualList = makeUnusualList(wordList, hashFile)
+
+    unusualf = open("unusualwordlist.txt", "w") #file to output to
     for word in unusualList:
-        print(word)
+        unusualf.write(word + "\n")
+    unusualf.close()
 
 #function to parse that the given input is a real website name/has at least 1 real website.
 #throw errors for improperly formated websites
