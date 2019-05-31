@@ -2,33 +2,37 @@
 #written by Isaiah K. Lee
 
 #imports
-from bs4 import BeautifulSoup
-import sys
-import requests
-import re   #for further text processing
-import listnode as ls
-from hashlib import sha256
+from bs4 import BeautifulSoup #for scraping
+import sys                  #to get command line args
+import requests             #for getting webpage data
+import re                   #for further text processing
+import listnode as ls       #my simple listnode to make a hashtable linked list 
+from hashlib import sha256  #to do non random seed hashing (vuln to attacks, but this isn't an app that deals with any vulnerable data anyways like password hashing is)
+import os.path              #to check if input file exists
+
 
 #main function
 #inputParam/s: website to scrape, or list of websites to scrape in .txt file delineated by newlines (maybe also add json support)
 #output/s: return final unusual word list as json to be used and displayed in html page.
 def main():
     #url = 'https://en.wikipedia.org/wiki/Extremely_low_frequency'  ||  http://localhost/index1/
-    url = sys.argv[1]
+    fileorurl = sys.argv[1]
     hashFile = sys.argv[2]
 
     #if we're given a url, just parse it normally. 
-    if url.find("http://") == 0 or url.find("https://") == 0:
+    if fileorurl.find("http://") == 0 or url.find("https://") == 0:
         #internet stuff
         response = requests.get(url)
         if response.status_code != 200:
             print("there's been an error in fetching the website")
             exit()
+        #soupify
+        soup = BeautifulSoup(response.content, 'html.parser')
+        wordList = parseText(soup)
     else:
-        response = checkInput(url)
-    #soupify
-    soup = BeautifulSoup(response.content, 'html.parser')
-    wordList = parseText(soup)
+        #return a laaarge wordlist of all sites scraped. 
+        wordList = checkInput(fileorurl)
+    
     unusualList = makeUnusualList(wordList, hashFile)
 
     unusualf = open("unusualwordlist.txt", "w") #file to output to
@@ -39,10 +43,28 @@ def main():
 #function to parse that the given input is a real website name/has at least 1 real website.
 #throw errors for improperly formated websites
 #inputParam/s: the list main is given, but puts it into a nice array
-#output/s: return array of good websites (only contains one thing if only one website given to it)
-def checkInput(inarray):
-    print("todo")
+#output/s: return array of words scraped from all good websites
+def checkInput(infilename):
+    retlist = []
+    with open(infilename, "r") as urlfile:
+        #check if file empty
+        #TODO
 
+        for i, aurl in enumerate(wordf):
+            #check if the url exists. 
+            response = requests.get(url)
+            if response.status_code != 200:
+                continue
+            #if it does, soupify, parse, and add to return list
+            #soupify
+            soup = BeautifulSoup(response.content, 'html.parser')
+            retList.append(parseText(soup))
+            
+
+    #parse all in parse list, and add to return word array. 
+
+    #return
+    return retlist
 
 #function to deal with robots.txt
 #inputParam/s: the website to check the robot.txt of.
@@ -51,8 +73,8 @@ def checkInput(inarray):
 
 
 
-#function to parse webdata into word array?
-#output/s: return json words list with html tags and other useless/code stuff stripped
+#function to parse webdata into word array
+#output/s: return array of words with html tags and other useless/code stuff stripped
 def parseText(soup):
     #remove script and style elements
     for script in soup(["script", "style"]):
